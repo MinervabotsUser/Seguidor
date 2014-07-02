@@ -1,6 +1,7 @@
 #include "Model.h"
 #include "Const.h"
-
+#include "Conteoler.h"
+#include "Fuzzy.h"
 #define DEBUG
 
 #include <SoftwareSerial.h>
