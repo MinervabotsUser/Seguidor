@@ -4,27 +4,31 @@
 class LightSensor
 {
   public:
-  void Init(unsigned short port);
-  float getValue();
-  void setMin(unsigned m);
-  void setMax(unsigned m);
-  unsigned getMin(){return minRead;};
-  unsigned getMax(){return maxRead;};
-  void setWeight(float w);
-  int getRawValue();
+    void Init(unsigned short port, float weight);
+    float getValue();
+    void setMin(unsigned m);
+    void setMax(unsigned m);
+    unsigned getMin(){return minRead;};
+    unsigned getMax(){return maxRead;};
+    float getWeight();
+    int getRawValue();
   private:
-  unsigned short port;
-  unsigned minRead;
-  unsigned maxRead;
-  float weight;
-  float value;
+    unsigned short port;
+    unsigned minRead;
+    unsigned maxRead;
+    float weight;
+    float value;
 };
-void LightSensor::Init(unsigned short port)
+
+void LightSensor::Init(unsigned short port,float weight)
 {
   this->port = port;
+  Serial.print("===");
+  Serial.print(weight);
+  Serial.println("===");
+  this->weight = weight;
   minRead = 1024;
   maxRead = 0;
-  weight = 1.0;
 }
 void LightSensor::setMin(unsigned m)
 {
@@ -34,9 +38,8 @@ void LightSensor::setMax(unsigned m)
 {
   maxRead = m;
 }
-void LightSensor::setWeight(float w)
-{
-  weight = w;
+float LightSensor::getWeight(){
+  return weight;
 }
 int LightSensor::getRawValue()
 {
@@ -46,7 +49,13 @@ int LightSensor::getRawValue()
 float LightSensor::getValue()
 {
   value = analogRead(port);
-  value = (value - minRead) * 1000.0 / (maxRead - minRead);
+  value = (value - minRead) * 1000.0 / (maxRead - minRead); 
+  if(value > 700){
+    value = 1;
+  }else{
+    value = 0;
+  }
+  
   return weight * value;
 }
 

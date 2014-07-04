@@ -23,14 +23,30 @@ private:
 
 void Model::Init()
 {
-  for(int i  = 0; i < NUMBER_OF_SENSORS; i++)
-  {
-    sensors[i].Init(i);
+  float weight = 0;
+  for(int i  = 0; i < NUMBER_OF_SENSORS; i++){
+    weight = i - NUMBER_OF_SENSORS/2;
+    sensors[i].Init(i,weight);
   }
   getMinMax();
 }
 
 float Model::getCenterOfMass(){
+  float mass = 0;
+  centerOfMass = 0;
+  for(int i=0; i < NUMBER_OF_SENSORS;i++){
+     mass += sensors[i].getValue();
+     centerOfMass += sensors[i].getValue() * sensors[i].getWeight();
+  }
+  centerOfMass /= mass;
+  centerOfMass -=  (sensors[0].getWeight()  + sensors[NUMBER_OF_SENSORS - 1].getWeight())/2;
+  #ifdef DEBUG
+  Serial.print("Massa: ");
+  Serial.print(mass);
+  Serial.print("\tCentro de massa: ");
+  Serial.println(centerOfMass);
+  #endif
+  
   return centerOfMass;
 }
 
@@ -52,7 +68,7 @@ void Model::getMinMax(){
   float vel = 1;
   float tempoInicial = millis();
   int delayCall = 100;
-  for(int j=0;j < 5;j++){
+  for(int j=0;j < 1;j++){
     do{
       control.rotateRight(vel);
       for(int i = 0; i < NUMBER_OF_SENSORS;i++){
@@ -96,7 +112,7 @@ void Model::getMinMax(){
   do{
     readSensors();
     Serial.println(sensors[3].getRawValue());
-  }while(sensors[3].getRawValue() < 750);
+  }while(sensors[3].getRawValue() < 50);
   control.stopMotors();
 }
 #endif
