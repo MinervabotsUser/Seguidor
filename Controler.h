@@ -5,24 +5,27 @@
 
 class Controler
 {
-  public:
-    void rotateLeft(float vel);
-    void rotateRight(float vel);
-    void stopMotors();
+public:
+  void rotateLeft(float vel);
+  void rotateRight(float vel);
+  void foward(float vel);
+  void stopMotors();
+  void motorRight(float vel);
+  void motorLeft(float vel);
 };
 
 class PIDControler
 {
-  public:
-    void Init(float Kp, float Kd, float Ki);
-    float Run(float error);
-    //float Run(float sensorReads, float expected);
-  private:
-    float p;
-    float d, i;
-    float integral, derivative, proportional;
-    float lastError;
-    unsigned long lastRun;
+public:
+  void Init(float Kp, float Kd, float Ki);
+  float Run(float error);
+  //float Run(float sensorReads, float expected);
+private:
+  float p;
+  float d, i;
+  float integral, derivative, proportional;
+  float lastError;
+  unsigned long lastRun;
 };
 void Controler::rotateLeft(float vel)
 {
@@ -32,6 +35,35 @@ void Controler::rotateLeft(float vel)
   analogWrite(TERRA_DIREITO, MAX_SPEED * vel);
 }
 
+void Controler::motorRight(float vel)
+{
+  if(vel >= 0)
+  {
+    analogWrite(MOTOR_DIREITO, MAX_SPEED * vel);
+    analogWrite(TERRA_DIREITO, 0);
+  }
+  else
+  {
+    analogWrite(MOTOR_DIREITO, 0);
+    analogWrite(TERRA_DIREITO, MAX_SPEED * vel);
+  }
+}
+
+
+void Controler::motorLeft(float vel)
+{
+  if(vel >= 0)
+  {
+    analogWrite(MOTOR_ESQUERDO, MAX_SPEED * vel);
+    analogWrite(TERRA_ESQUERDO, 0);
+  }
+  else
+  {
+    analogWrite(MOTOR_ESQUERDO, 0);
+    analogWrite(TERRA_ESQUERDO, MAX_SPEED * vel);
+  }
+}
+
 void Controler::rotateRight(float vel)
 {
   analogWrite(MOTOR_ESQUERDO, 0);
@@ -39,6 +71,15 @@ void Controler::rotateRight(float vel)
   analogWrite(MOTOR_DIREITO, MAX_SPEED * vel);
   analogWrite(TERRA_DIREITO, 0);
 }
+
+void Controler::foward(float vel)
+{
+  analogWrite(MOTOR_ESQUERDO,  MAX_SPEED * vel);
+  analogWrite(TERRA_ESQUERDO, 0);
+  analogWrite(MOTOR_DIREITO, MAX_SPEED * vel);
+  analogWrite(TERRA_DIREITO, 0);
+}
+
 
 void Controler::stopMotors()
 {
@@ -66,6 +107,7 @@ float PIDControler::Run(float error)
   return integral + proportional + derivative;
 }
 #endif
+
 
 
 

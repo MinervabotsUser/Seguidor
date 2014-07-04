@@ -143,7 +143,7 @@ float FuzzyComposition::avaliate(){
 				middle 	= ((aux->next->point - aux->point) / 2.0) + aux->point;
 			}
 			numerator 	+= middle * area;
-			denominator += areaFu
+			denominator += area;
 		}
 		aux = aux->next;
 	}
