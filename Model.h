@@ -18,7 +18,7 @@
 class Model
 {
 public:
-  //Model();
+  Model();
   void Init();
   float getCenterOfMass();
   void printSensors();
@@ -32,69 +32,51 @@ private:
   Fuzzy *fuzzy;
 };
 
-void Model::Init()
-{
-  fuzzy = new Fuzzy();
-  for(int i  = 0; i < NUMBER_OF_SENSORS; i++)
-  {
+Model::Model(){
+  for(int i  = 0; i < NUMBER_OF_SENSORS; i++){
     sensors[i].Init(i);
   }
+}
+void Model::Init(){
+  fuzzy = new Fuzzy();
   getMinMax();
   Serial.println("Calibrou");
   //Criando Variavceis de Input dos Sensores
-  FuzzyInput *SensorMostLeft = new FuzzyInput(1);
-  FuzzyInput *SensorLeft = new FuzzyInput(2);
-  FuzzyInput *SensorCenterLeft = new FuzzyInput(3);
-  FuzzyInput *SensorCenterRight = new FuzzyInput(4);
-  FuzzyInput *SensorRight = new FuzzyInput(5);
-  FuzzyInput *SensorMostRight = new FuzzyInput(6);
+  FuzzyInput* fuzzySensors[NUMBER_OF_SENSORS];
   //Fuzzy Sets
-  FuzzySet* Dark1 = new FuzzySet(0.0,0.0,0.2,0.8);
-  FuzzySet* Bright1 = new FuzzySet(0.2,0.8,1.0,1.0);
-
-  FuzzySet* Dark2 = new FuzzySet(0.0,0.0,0.2,0.8);
-  FuzzySet* Bright2 = new FuzzySet(0.2,0.8,1.0,1.0);
-
-  FuzzySet* Dark3 = new FuzzySet(0.0,0.0,0.2,0.8);
-  FuzzySet* Bright3 = new FuzzySet(0.2,0.8,1.0,1.0);
-
-  FuzzySet* Dark4 = new FuzzySet(0.0,0.0,0.2,0.8);
-  FuzzySet* Bright4 = new FuzzySet(0.2,0.8,1.0,1.0);
-
-  FuzzySet* Dark5 = new FuzzySet(0.0,0.0,0.2,0.8);
-  FuzzySet* Bright5 = new FuzzySet(0.2,0.8,1.0,1.0);
-
-  FuzzySet* Dark6 = new FuzzySet(0.0,0.0,0.2,0.8);
-  FuzzySet* Bright6 = new FuzzySet(0.2,0.8,1.0,1.0);
-  //Adding Fuzzy Sets
-  SensorMostLeft->addFuzzySet(Bright1);
-  SensorMostLeft->addFuzzySet(Dark1);
-
-  SensorLeft->addFuzzySet(Bright2);
-  SensorLeft->addFuzzySet(Dark2);
-
-  SensorCenterLeft->addFuzzySet(Bright3);
-  SensorCenterLeft->addFuzzySet(Dark3);
-
-  SensorCenterRight->addFuzzySet(Bright4);
-  SensorCenterRight->addFuzzySet(Dark4);
-
-  SensorRight->addFuzzySet(Bright5);
-  SensorRight->addFuzzySet(Dark5);
-
-  SensorMostRight->addFuzzySet(Bright6);
-  SensorMostRight->addFuzzySet(Dark6);
-
-  //Add Fuzzy Inputs
-
-  fuzzy->addFuzzyInput(SensorMostLeft);
-  fuzzy->addFuzzyInput(SensorLeft);
-  fuzzy->addFuzzyInput(SensorCenterLeft);
-  fuzzy->addFuzzyInput(SensorCenterRight);
-  fuzzy->addFuzzyInput(SensorRight);
-  fuzzy->addFuzzyInput(SensorMostRight);
-
-  //Creating Ouput
+  FuzzySet* bright[NUMBER_OF_SENSORS];
+  FuzzySet* dark[NUMBER_OF_SENSORS];
+  //Fuzzy OutPuts
+  FuzzyOutput* cog = new FuzzyOutput(3);
+  FuzzySet* cogFuzzySets[NUMBER_OF_SENSORS];
+  
+  //Setting inputs
+  for(int i = 0; i < NUMBER_OF_SENSORS; i++){
+    fuzzySensors[i] = new FuzzyInput(i+1);
+    
+    bright[i] = new FuzzySet(-0.9,-0.1,0.1,0.9);
+    dark[i] = new FuzzySet(0.1,0.9,1.1,1.9);  
+    
+    fuzzySensors[i]->addFuzzySet(bright[i]);
+    fuzzySensors[i]->addFuzzySet(dark[i]);
+    fuzzy->addFuzzyInput(fuzzySensors[i]);  
+  }
+  
+  //Setting Ouput 
+  
+  cogFuzzySets[0] = new FuzzySet(-3.4,-2.6, -2.4, -1.6);
+  cogFuzzySets[1] = new FuzzySet(-2.4, -1.6, -1.4, -0.6);
+  cogFuzzySets[2] = new FuzzySet(-1.4, -0.6, -0.4, 0.4);
+  cogFuzzySets[3] = new FuzzySet(-0.4, 0.4, 0.6, 1.4);
+  cogFuzzySets[4] = new FuzzySet(0.6, 1.4, 1.6, 2.4);
+  cogFuzzySets[5] = new FuzzySet(1.6, 2.4, 2.6, 3.4);
+  
+  for(int i = 0; i < NUMBER_OF_SENSORS; i++){
+    cog->addFuzzySet(cogFuzzySets[i]);
+  }
+  
+  fuzzy->addFuzzyOutput(cog);
+  /*
   FuzzyOutput* MotorRight = new FuzzyOutput(1);
 
   FuzzySet *NegativeHighRight = new FuzzySet(-1.0,-0.25,-0.25,-0.5);
@@ -126,8 +108,10 @@ void Model::Init()
   MotorLeft->addFuzzySet(PositiveHighLeft);
 
   fuzzy->addFuzzyOutput(MotorLeft);
+  */
   //Rules
   //if Sensor Right is Dark Cog is Positive
+  /*
   FuzzyRuleAntecedent* ifSensorMostRightIsDark = new FuzzyRuleAntecedent();
   ifSensorMostRightIsDark->joinWithOR(Dark5,Dark6);
   FuzzyRuleConsequent* thenCogPositive = new FuzzyRuleConsequent();
@@ -153,24 +137,41 @@ void Model::Init()
   thenCogNegative->addOutput(NegativeLowLeft);
   FuzzyRule *fuzzyRule03 = new FuzzyRule(3,ifSensorLeftIsDark,thenCogNegative);
   fuzzy->addFuzzyRule(fuzzyRule03);
+  */
 
+  FuzzyRuleAntecedent* antecedents[NUMBER_OF_SENSORS];
+  FuzzyRuleConsequent* consequents[NUMBER_OF_SENSORS];
+  FuzzyRule* rules[NUMBER_OF_SENSORS];
+  
+  FuzzySet* set[NUMBER_OF_SENSORS][NUMBER_OF_SENSORS] = {{dark[0],bright[1],bright[2],bright[3],bright[4],bright[5]},
+                                                        {bright[0],dark[1],bright[2],bright[3],bright[4],bright[5]},
+                                                        {bright[0],bright[1],dark[2],bright[3],bright[4],bright[5]},
+                                                        {bright[0],bright[1],bright[2],dark[3],bright[4],bright[5]},
+                                                        {bright[0],bright[1],bright[2],bright[3],dark[4],bright[5]},
+                                                        {bright[0],bright[1],bright[2],bright[3],bright[4],dark[5]}};
+  
+  for (int i = 0;i < NUMBER_OF_SENSORS; i++){
+    antecedents[i] = new FuzzyRuleAntecedent();
+    antecedents[i]->joinWithAND(set[i]);
+    consequents[i] = new FuzzyRuleConsequent();
+    consequents[i]->addOutput(cogFuzzySets[i]);
+    rules[i] = new FuzzyRule(i+1,antecedents[i],consequents[i]);
+    fuzzy->addFuzzyRule(rules[i]);
+  }
 }
-
 float Model::getCenterOfMass(){
   readSensors();
-  for(int i = 1; i <= NUMBER_OF_SENSORS;i++)
-  {
+  for(int i = 0; i <= NUMBER_OF_SENSORS;i++){
     fuzzy->setInput(i,sensors[i].getValue());
   }
   fuzzy->fuzzify();
-  return fuzzy->defuzzify(1);
+  return fuzzy->defuzzify(3);
 }
 
 void Model::moveRobot()
 {
   readSensors();
-  for(int i = 1; i <= NUMBER_OF_SENSORS;i++)
-  {
+  for(int i = 1; i <= NUMBER_OF_SENSORS;i++){
     fuzzy->setInput(i,sensors[i].getValue());
   }
   fuzzy->fuzzify();
@@ -195,23 +196,35 @@ void Model::printSensors(){
     Serial.print(sensors[i].getValue());
     Serial.print("\t");
   }
-  Serial.println();
+  //Serial.println();
 }
 
 void Model::getMinMax(){
-  float vel = 0.15;
-  control.rotateRight(vel);
-  unsigned long b = millis();
-  for (int i = 0; i < 5; i++){
+  float vel = 0.3;
+  float tempoInicial = millis();
+  int delayCall = 500;
+  for(int j=0;j < 5;j++){
+    do{
+      control.rotateRight(vel);
+      for(int i = 0; i < NUMBER_OF_SENSORS;i++){
+        int actualRead = analogRead(i);
+        if(actualRead < sensors[i].getMin())sensors[i].setMin(actualRead);
+        if(actualRead > sensors[i].getMax())sensors[i].setMax(actualRead);
+      }
+    #ifndef BLACK
+    }while(sensors[0].getRawValue() < LIMIAR_MAIS_ESQUERDO);
+    #else
+    }while(sensors[0].getRawValue() > LIMIAR_MAIS_ESQUERDO);
+    #endif
+    tempoInicial = millis();
     do{
       for(int i = 0; i < NUMBER_OF_SENSORS;i++){
         int actualRead = analogRead(i);
         if(actualRead < sensors[i].getMin())sensors[i].setMin(actualRead);
         if(actualRead > sensors[i].getMax())sensors[i].setMax(actualRead);
       }
-    }
-    while(millis() - b < 300);
-    b = millis();
+    }while(millis() - tempoInicial < delayCall);   
+   
     control.rotateLeft(vel);
     do{
       for(int i = 0; i < NUMBER_OF_SENSORS;i++){
@@ -219,26 +232,28 @@ void Model::getMinMax(){
         if(actualRead < sensors[i].getMin())sensors[i].setMin(actualRead);
         if(actualRead > sensors[i].getMax())sensors[i].setMax(actualRead);
       }
-
-    }
-    while(millis() - b < 300);
-    control.stopMotors();
+    #ifndef BLACK
+    }while(sensors[NUMBER_OF_SENSORS - 1].getRawValue() < LIMIAR_MAIS_DIREITO);
+    #else
+    }while(sensors[NUMBER_OF_SENSORS - 1].getRawValue() > LIMIAR_MAIS_DIREITO);
+    #endif
+ 
+    tempoInicial = millis();
+    do{
+      for(int i = 0; i < NUMBER_OF_SENSORS;i++){
+        int actualRead = analogRead(i);
+        if(actualRead < sensors[i].getMin())sensors[i].setMin(actualRead);
+        if(actualRead > sensors[i].getMax())sensors[i].setMax(actualRead);
+      }
+    }while(millis() - tempoInicial < delayCall);
+    
   }
-  //Retornar ao centro - Tem que melhorar isso
+  control.stopMotors();
+  // Retornar ao centro - Tem que melhorar isso
   control.rotateRight(vel);
-  b = millis();
   do{
     readSensors();
-  }
-  while(sensors[3].getValue() < 0.5 || sensors[4].getValue() < 0.5  );
+  }while(sensors[3].getValue() < 0.8);
   control.stopMotors();
 }
 #endif
-
-
-
-
-
-
-
-

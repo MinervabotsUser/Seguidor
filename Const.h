@@ -16,7 +16,7 @@
 /***********************************/
 
 /***********  Limiar dos Sensores ****/
-#define LIMIAR_MAIS_ESQUERDO        800
+#define LIMIAR_MAIS_ESQUERDO        350
 #define LIMIAR_ESQUERDO             800
 #define LIMIAR_MENOS_ESQUERDO       600
 #define LIMIAR_MENOS_DIREITO        750

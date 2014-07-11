@@ -47,7 +47,7 @@ float LightSensor::getValue()
 {
   value = analogRead(port);
   value = (value - minRead) / (maxRead - minRead);
-  return weight * value;
+  return value;
 }
 
 #endif
