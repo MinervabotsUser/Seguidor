@@ -1,6 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 #define DEBUG
+#define BLACK
 #include "Arduino.h"
 #include "Const.h"
 #include "Controler.h"
@@ -9,7 +10,7 @@
 class Model
 {
 public:
-  //Model();
+  Model();
   void Init();
   float getCenterOfMass();
   void printSensors();
@@ -21,13 +22,14 @@ private:
   void getMinMax();  
 };
 
-void Model::Init()
-{
+Model::Model(){
   float weight = 0;
   for(int i  = 0; i < NUMBER_OF_SENSORS; i++){
     weight = i - NUMBER_OF_SENSORS/2;
     sensors[i].Init(i,weight);
   }
+}
+void Model::Init(){
   getMinMax();
 }
 
@@ -40,7 +42,7 @@ float Model::getCenterOfMass(){
   }
   centerOfMass /= mass;
   centerOfMass -=  (sensors[0].getWeight()  + sensors[NUMBER_OF_SENSORS - 1].getWeight())/2;
-  #ifdef DEBUG
+  #ifdef DEBUG_1
   Serial.print("Massa: ");
   Serial.print(mass);
   Serial.print("\tCentro de massa: ");
@@ -65,10 +67,10 @@ void Model::printSensors(){
 }
 
 void Model::getMinMax(){
-  float vel = 1;
+  float vel = 0.3;
   float tempoInicial = millis();
-  int delayCall = 100;
-  for(int j=0;j < 1;j++){
+  int delayCall = 200;
+  for(int j=0;j < 5;j++){
     do{
       control.rotateRight(vel);
       for(int i = 0; i < NUMBER_OF_SENSORS;i++){
@@ -76,8 +78,11 @@ void Model::getMinMax(){
         if(actualRead < sensors[i].getMin())sensors[i].setMin(actualRead);
         if(actualRead > sensors[i].getMax())sensors[i].setMax(actualRead);
       }
+    #ifndef BLACK
     }while(sensors[0].getRawValue() < LIMIAR_MAIS_ESQUERDO);
-    
+    #else
+    }while(sensors[0].getRawValue() > LIMIAR_MAIS_ESQUERDO);
+    #endif
     tempoInicial = millis();
     do{
       for(int i = 0; i < NUMBER_OF_SENSORS;i++){
@@ -94,8 +99,12 @@ void Model::getMinMax(){
         if(actualRead < sensors[i].getMin())sensors[i].setMin(actualRead);
         if(actualRead > sensors[i].getMax())sensors[i].setMax(actualRead);
       }
+    #ifndef BLACK
     }while(sensors[NUMBER_OF_SENSORS - 1].getRawValue() < LIMIAR_MAIS_DIREITO);
-    
+    #else
+    }while(sensors[NUMBER_OF_SENSORS - 1].getRawValue() > LIMIAR_MAIS_DIREITO);
+    #endif
+ 
     tempoInicial = millis();
     do{
       for(int i = 0; i < NUMBER_OF_SENSORS;i++){
@@ -112,7 +121,7 @@ void Model::getMinMax(){
   do{
     readSensors();
     Serial.println(sensors[3].getRawValue());
-  }while(sensors[3].getRawValue() < 50);
+  }while(sensors[3].getValue() != 1);
   control.stopMotors();
 }
 #endif

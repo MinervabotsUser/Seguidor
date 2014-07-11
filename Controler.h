@@ -16,7 +16,6 @@ class PIDControler
   public:
     void Init(float Kp, float Kd, float Ki);
     float run(float error);
-    //float Run(float sensorReads, float expected);
   private:
     float p;
     float d, i;
@@ -57,13 +56,15 @@ void PIDControler::Init(float Kp, float Kd, float Ki)
 
 float PIDControler::run(float error)
 {
+  float output;
   float dt = (micros () - lastRun) * 10^(-6);
   lastRun = micros();
   integral += i * error * dt ;
   derivative = d * (error - lastError) / dt;
   lastError = error;
   proportional = p * error;
-  return integral + proportional + derivative; 
+  output = proportional;
+  return output; 
 }
 #endif
 

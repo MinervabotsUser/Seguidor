@@ -21,7 +21,7 @@
 #define LIMIAR_MENOS_ESQUERDO       600
 #define LIMIAR_MENOS_DIREITO        750
 #define LIMIAR_DIREITO              900
-#define LIMIAR_MAIS_DIREITO         900
+#define LIMIAR_MAIS_DIREITO         850
 /***********************************/
 
 /***********  Motores  *************/
@@ -31,13 +31,12 @@
 #define TERRA_ESQUERDO 6
 /***********************************/
 
-/***********  Constantes PID  ******/
-#define kp 6
-#define ki 0.025
-#define kd 4
-/***********************************/
 #define MAX_SPEED 255
-#define SET_POINT 26
+/***********  Constantes PID  ******/
+#define kp MAX_SPEED/2
+#define ki 0
+#define kd 0
+/***********************************/
 
 #define NUMBER_OF_SENSORS  6
 

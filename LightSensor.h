@@ -1,6 +1,8 @@
 #ifndef LIGHT_SENSOR_H
 #define LIGHT_SENSOR_H
+#define BLACK
 #include "Arduino.h"
+
 class LightSensor
 {
   public:
@@ -27,8 +29,13 @@ void LightSensor::Init(unsigned short port,float weight)
   Serial.print(weight);
   Serial.println("===");
   this->weight = weight;
+  #ifndef  BLACK
   minRead = 1024;
   maxRead = 0;
+  #else
+  minRead = 0;
+  maxRead = 1024;
+  #endif
 }
 void LightSensor::setMin(unsigned m)
 {
@@ -49,14 +56,18 @@ int LightSensor::getRawValue()
 float LightSensor::getValue()
 {
   value = analogRead(port);
-  value = (value - minRead) * 1000.0 / (maxRead - minRead); 
-  if(value > 700){
+  value = (value - minRead) * 1000.0 / (maxRead - minRead);
+  #ifndef BLACK
+    if(value > 700){
+  #else
+    if(value < 700){
+  #endif
     value = 1;
   }else{
     value = 0;
   }
-  
-  return weight * value;
+
+  return value;
 }
 
 #endif
