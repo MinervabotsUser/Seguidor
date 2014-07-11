@@ -30,11 +30,10 @@ void setup(){
   analogWrite(MOTOR_DIREITO, 255);
   analogWrite(TERRA_DIREITO, 255);  
   model.Init();
-  Pid.Init(9,4,.025);  
+  Pid.Init(9,4,.025);
+  
 }
 void loop(){
   model.printSensors();
-  Serial.print("\t");
-  Serial.println(model.getCenterOfMass());
-  //model.moveRobot();
+  model.moveRobot();
 }

@@ -40,8 +40,9 @@ int FuzzyRule::getIndex(){
 bool FuzzyRule::evaluateExpression(){
 	if (this->fuzzyRuleAntecedent != NULL){
 		float powerOfAntecedent = this->fuzzyRuleAntecedent->evaluate();
+
 		(powerOfAntecedent > 0.0) ?	(this->fired = true) : (this->fired = false);
-                Serial.println(powerOfAntecedent);
+
 		this->fuzzyRuleConsequent->evaluate(powerOfAntecedent);
 	}
 	return this->fired;
