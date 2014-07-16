@@ -1,39 +1,13 @@
-#include "Model.h"
-#include "Const.h"
-#include "Controler.h"
-#include "Fuzzy.h"
-#include "FuzzyRule.h"
-#include "FuzzyComposition.h"
-#include "FuzzyRuleConsequent.h"
-#include "FuzzyOutput.h"
-#include "FuzzyInput.h"
-#include "FuzzyIO.h"
-#include "FuzzySet.h"
-#include "FuzzyRuleAntecedent.h"
-#define DEBUG
+#include "Seguidor.h"
 
-#include <SoftwareSerial.h>
-// software serial #1: TX = digital pin 2, RX = digital pin 3
-SoftwareSerial bluetooth(BLUETOOTH_TX, BLUETOOTH_RX);
-
-PIDControler Pid;
-Model model;
-Controler controler;
-
-void setup(){
-  #ifdef DEBUG
-  Serial.begin(9600);
-  bluetooth.begin(9600);
-  #endif
-  analogWrite(MOTOR_ESQUERDO, 255);
-  analogWrite(TERRA_ESQUERDO, 255);
-  analogWrite(MOTOR_DIREITO, 255);
-  analogWrite(TERRA_DIREITO, 255);  
-  model.Init();
-  Pid.Init(9,4,.025);
-  
+Seguidor seguidor(6,5,6,11,10);
+void setup() {
+  for(int i = 0; i < 6; i++)
+   seguidor.addSensor(i);
+  seguidor.calibrate();
 }
-void loop(){
-  model.printSensors();
-  model.moveRobot();
+
+void loop() {
+  seguidor.movePid();
+
 }

@@ -1,32 +1,60 @@
 #ifndef MOTOR_H
 #define MOTOR_H
+#include "Arduino.h"
 
-class Motor()
+enum {FOWARD,BACKWARD};
+
+class Motor
 {
   public:
-    void Init(float R, float L, float Kt, float J, float B, float Ke);
-  private:
-  void CalculateCurrent();
-    float R, L, Kt, J, B, Ke;
-    float Va, Ia, Ea;
-}
-
-void Motor::Init(float R, float L, float Kt, float J, float B, float Ke)
-{
-  this->R = R;
-  this->L = L;
-  this->Kt = Kt;
-  this->J = J;
-  this->B = B;
-  this->Ke;
-  this->Va = 0;
-  this->Ia = 0;
-  this->Ea = 0;
-}
-
-void Motor::CalculateCurrent(float Va)
-{
+  Motor(int positivePin, int negativePin):positivePin(positivePin), negativePin(negativePin),minSpeed(0),maxSpeed(255)
+  {
+    
+  };
+  void rotatePwm(int pwm,int d)
+  {
+      if(d == FOWARD)
+    {
+      analogWrite(positivePin,pwm);
+      analogWrite(negativePin,0);
+    }
+    else
+    {
+      analogWrite(positivePin,0);
+      analogWrite(negativePin,pwm);
+    }
   
-}
+  }
+  void stopMotor()
+  {
+    analogWrite(positivePin,255);
+    analogWrite(negativePin,255);
+  };
+  void rotate(float s, int d)
+  {
+    if(d == FOWARD)
+    {
+      analogWrite(positivePin,(maxSpeed - minSpeed) * s + minSpeed);
+      analogWrite(negativePin,0);
+    }
+    else
+    {
+      analogWrite(positivePin,0);
+      analogWrite(negativePin,(maxSpeed - minSpeed) * s + minSpeed);
+    }
+  
+  };
+  void setMaxSpeed(int maxS)
+  {
+    this->maxSpeed = maxS;
+  };
+  void setMinSpeed(int minS)
+  {
+    this->minSpeed = minS;
+  };
+   int minSpeed,maxSpeed;
+  private:
+    int positivePin, negativePin;
+};
 
 #endif

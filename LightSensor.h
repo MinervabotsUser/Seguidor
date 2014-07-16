@@ -4,7 +4,7 @@
 class LightSensor
 {
   public:
-  void Init(unsigned short port);
+  LightSensor(unsigned short port);
   float getValue();
   void setMin(unsigned m);
   void setMax(unsigned m);
@@ -19,7 +19,7 @@ class LightSensor
   float weight;
   float value;
 };
-void LightSensor::Init(unsigned short port)
+LightSensor::LightSensor(unsigned short port)
 {
   this->port = port;
   minRead = 1024;
@@ -47,7 +47,9 @@ float LightSensor::getValue()
 {
   value = analogRead(port);
   value = (value - minRead) / (maxRead - minRead);
-  return weight * value;
+  return value;
 }
 
+
 #endif
+
