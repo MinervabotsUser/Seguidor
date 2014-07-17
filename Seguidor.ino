@@ -14,19 +14,20 @@ void setup() {
   for(int i = 5; i >= 0; i--)
    seguidor.addSensor(i);
    
-  seguidor.setMaxSpeed(100);
-  seguidor.setMinSpeed(30);
   seguidor.calibrateManual(minMaxSensors);
   Serial.println("Calibrou");
-  
+  pinMode(22,OUTPUT);
+  digitalWrite(22,HIGH);
+  pinMode(23,OUTPUT);
+  digitalWrite(23,LOW);
 }
 
 void loop() {
   if(start)
   {
-    seguidor.warmMotors();
+    //seguidor.warmMotors();
     start = false;
   }
     
-  seguidor.moveFuzzy();
+  seguidor.moveFoward(.2);
 }

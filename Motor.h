@@ -26,6 +26,23 @@ class Motor
     }
   
   }
+  void setConstants(double a,double b, double c,double d)
+  {
+    this->a = a;
+    this->b = b;
+    this->c = c;
+    this->d = d;
+  };
+  int getPwm(float s)
+  {
+    s = s * (maxTick-minTick) + minTick;
+    return round(a*exp(b*s)+c*exp(d*s));
+  };
+  void setTicks(int m,int M)
+  {
+    minTick =m;
+     maxTick =M;
+  };
   void stopMotor()
   {
     digitalWrite(directionPin1,HIGH);
@@ -57,6 +74,8 @@ class Motor
    int minSpeed,maxSpeed;
   private:
     int pwmPin,directionPin1,directionPin2;
+    double a,b,c,d;
+    int maxTick,minTick;
 };
 
 #endif

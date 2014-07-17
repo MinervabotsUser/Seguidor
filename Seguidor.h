@@ -21,7 +21,11 @@ class Seguidor
 
       activeSensors = 0;
       rightMotor = new Motor(MotorRight, dir1Right1, dir1Right2);
+      rightMotor->setConstants(1.375e4,0.0003937,-1.815e4,-0.01682);
+      rightMotor->setTicks(6580,14759);
       leftMotor = new Motor(MotorLeft, dir1Left1, dir1Left2);
+      leftMotor->setConstants(1.34e4,0.0005189,-1.79e4,-0.01754);
+      leftMotor->setTicks(6402,14876);
       pid = new PIDControler(9, 4, .025);
     };
     void addSensor(int pin)
@@ -85,8 +89,8 @@ class Seguidor
     }
     void moveFoward(float s)
     {
-      rightMotor->rotate(s, FOWARD);
-      leftMotor->rotate(s, FOWARD);
+       rightMotor->rotate(rightMotor->getPwm(s), FOWARD);
+      leftMotor->rotate(leftMotor->getPwm(s), FOWARD);
     };
     void rotateRight(float s)
     {
