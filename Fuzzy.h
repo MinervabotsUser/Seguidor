@@ -19,7 +19,6 @@ const int fis_gcR = 6;
 FIS_TYPE g_fisInput[fis_gcI];
 FIS_TYPE g_fisOutput[fis_gcO];
 
-// Setup routine runs once when you press reset:
 //***********************************************************************
 // Support functions for Fuzzy Inference System                          
 //***********************************************************************
@@ -43,6 +42,14 @@ FIS_TYPE fis_trimf(FIS_TYPE x, FIS_TYPE* p)
     if (b == c) return (FIS_TYPE) (t1*(a <= x)*(x <= b));
     t1 = min(t1, t2);
     return (FIS_TYPE) max(t1, 0);
+}
+
+// Gaussian Member Function
+FIS_TYPE fis_gaussmf(FIS_TYPE x, FIS_TYPE* p)
+{
+    FIS_TYPE s = p[0], c = p[1];
+    FIS_TYPE t = (x - c) / s;
+    return exp(-(t * t) / 2);
 }
 
 FIS_TYPE fis_min(FIS_TYPE a, FIS_TYPE b)
@@ -79,7 +86,7 @@ FIS_TYPE fis_array_operation(FIS_TYPE *array, int size, _FIS_ARR_OP pfnOp)
 // Pointers to the implementations of member functions
 _FIS_MF fis_gMF[] =
 {
-    fis_trapmf, fis_trimf
+    fis_trapmf, fis_trimf, fis_gaussmf
 };
 
 // Count of member function for each Input
@@ -113,17 +120,17 @@ FIS_TYPE** fis_gMFICoeff[] = { fis_gMFI0Coeff, fis_gMFI1Coeff, fis_gMFI2Coeff, f
 FIS_TYPE fis_gMFO0Coeff1[] = { -3.305, -2.695, -2.305, -1.695 };
 FIS_TYPE fis_gMFO0Coeff2[] = { -2.305, -1.695, -1.305, -0.6949 };
 FIS_TYPE fis_gMFO0Coeff3[] = { -1.305, -0.695, -0.305, 0.3051 };
-FIS_TYPE fis_gMFO0Coeff4[] = { -0.3051, 0.305, 0.695, 1.305 };
+FIS_TYPE fis_gMFO0Coeff4[] = { -0.3049, 0.3051, 0.6949, 1.305 };
 FIS_TYPE fis_gMFO0Coeff5[] = { 0.6949, 1.305, 1.695, 2.305 };
 FIS_TYPE fis_gMFO0Coeff6[] = { 1.695, 2.305, 2.695, 3.305 };
 FIS_TYPE* fis_gMFO0Coeff[] = { fis_gMFO0Coeff1, fis_gMFO0Coeff2, fis_gMFO0Coeff3, fis_gMFO0Coeff4, fis_gMFO0Coeff5, fis_gMFO0Coeff6 };
-FIS_TYPE fis_gMFO1Coeff1[] = { -0.4025, -0.09745, 0.09745, 0.4025 };
-FIS_TYPE fis_gMFO1Coeff2[] = { 0.09753, 0.4025, 0.5975, 0.9025 };
-FIS_TYPE fis_gMFO1Coeff3[] = { 0.5975, 0.9025, 1.097, 1.402 };
+FIS_TYPE fis_gMFO1Coeff1[] = { 0.2123, 0 };
+FIS_TYPE fis_gMFO1Coeff2[] = { 0.2123, 0.5 };
+FIS_TYPE fis_gMFO1Coeff3[] = { 0.2121, 0.9997 };
 FIS_TYPE* fis_gMFO1Coeff[] = { fis_gMFO1Coeff1, fis_gMFO1Coeff2, fis_gMFO1Coeff3 };
-FIS_TYPE fis_gMFO2Coeff1[] = { -0.4025, -0.09745, 0.09745, 0.4025 };
-FIS_TYPE fis_gMFO2Coeff2[] = { 0.09753, 0.4025, 0.5975, 0.9025 };
-FIS_TYPE fis_gMFO2Coeff3[] = { 0.7138, 0.7862, 1.214, 1.286 };
+FIS_TYPE fis_gMFO2Coeff1[] = { 0.2123, 0 };
+FIS_TYPE fis_gMFO2Coeff2[] = { 0.2123, 0.5 };
+FIS_TYPE fis_gMFO2Coeff3[] = { 0.2123, 1 };
 FIS_TYPE* fis_gMFO2Coeff[] = { fis_gMFO2Coeff1, fis_gMFO2Coeff2, fis_gMFO2Coeff3 };
 FIS_TYPE** fis_gMFOCoeff[] = { fis_gMFO0Coeff, fis_gMFO1Coeff, fis_gMFO2Coeff };
 
@@ -138,8 +145,8 @@ int* fis_gMFI[] = { fis_gMFI0, fis_gMFI1, fis_gMFI2, fis_gMFI3, fis_gMFI4, fis_g
 
 // Output membership function set
 int fis_gMFO0[] = { 0, 0, 0, 0, 0, 0 };
-int fis_gMFO1[] = { 0, 0, 0 };
-int fis_gMFO2[] = { 0, 0, 0 };
+int fis_gMFO1[] = { 2, 2, 2 };
+int fis_gMFO2[] = { 2, 2, 2 };
 int* fis_gMFO[] = { fis_gMFO0, fis_gMFO1, fis_gMFO2};
 
 // Rule Weights
@@ -340,5 +347,4 @@ class Fuzzy
       fis_evaluate();
     };
 };
-vvvc
 #endif

@@ -1,20 +1,32 @@
 #include "Seguidor.h"
+#include "LightSensor.h"
+#include "Motor.h"
+#include "Fuzzy.h"
+#include "Controler.h"
 
 Seguidor seguidor(6,6,4,5,9,10,11);
+bool start = true;
+int minMaxSensors[6][2] = {{54,917},{57,917},{53,938},{48,945},{81,874},{51,873}};
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200); // Arduino due
+  //Serial.begin(9600);
   
-  for(int i = 0; i < 6; i++)
+  for(int i = 5; i >= 0; i--)
    seguidor.addSensor(i);
    
-  
-  seguidor.setMaxSpeed(70);
-  seguidor.calibrate();
+  seguidor.setMaxSpeed(100);
+  seguidor.setMinSpeed(30);
+  seguidor.calibrateManual(minMaxSensors);
   Serial.println("Calibrou");
   
 }
 
 void loop() {
+  if(start)
+  {
+    seguidor.warmMotors();
+    start = false;
+  }
+    
   seguidor.moveFuzzy();
-
 }

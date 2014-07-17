@@ -29,6 +29,20 @@ class Seguidor
       lightSensors[activeSensors] = new LightSensor(pin);
       activeSensors++;
     };
+    void calibrateManual(int minMax[6][2]){
+      for(int i = 0; i < activeSensors;i++){
+          lightSensors[i]->setMin(minMax[i][0]);
+          lightSensors[i]->setMax(minMax[i][1]);
+      }
+    };
+    void warmMotors()
+    {
+        delay(100);
+        rightMotor->rotatePwm(100,FOWARD);
+        leftMotor->rotatePwm(100,FOWARD);
+        delay(5);
+        
+    };
     void calibrate()
     {
       unsigned long initTime = micros();
@@ -58,6 +72,11 @@ class Seguidor
     {
       rightMotor->setMaxSpeed(s);
       leftMotor->setMaxSpeed(s);
+    };
+    void setMinSpeed(int s)
+    {
+      rightMotor->setMinSpeed(s);
+      leftMotor->setMinSpeed(s);
     };
     void stopMotors()
     {
@@ -105,13 +124,17 @@ class Seguidor
       fuzzy.setFuzzyOutputs(inputs);
 
       cog = fuzzy.getCog();
-
       float output = pid->Run(cog);
-
+      
+      Serial.print("Cog: ");
+      Serial.print(cog);
+      Serial.print("\tOutput: ");
+      Serial.println(output);
+      /*
       if (cog < 0) {
         if ((rightMotor->maxSpeed + output) > 0) {
           rightMotor->rotatePwm(rightMotor->maxSpeed + output , FOWARD);
-        } else {
+        }else {
           rightMotor->rotatePwm(abs(rightMotor->maxSpeed + output) , BACKWARD);
         }
       }
@@ -128,9 +151,9 @@ class Seguidor
         rightMotor->rotate(1.0, FOWARD);
         leftMotor->rotate(1.0, FOWARD);
       }
-
+      */
     };
-
+    
   private:
     LightSensor  *lightSensors[6];
     Motor *rightMotor;
