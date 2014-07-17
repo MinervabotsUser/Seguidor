@@ -16,12 +16,12 @@
 class Seguidor
 {
   public:
-    Seguidor(int numberOfSensors, int MotorLeft, int GroundLeft, int MotorRight, int GroundRight)
+    Seguidor(int numberOfSensors, int MotorLeft, int dir1Left1, int dir1Left2, int MotorRight, int dir1Right1, int dir1Right2)
     {
-      
+
       activeSensors = 0;
-      rightMotor = new Motor(MotorRight, GroundRight);
-      leftMotor = new Motor(MotorLeft, GroundLeft);
+      rightMotor = new Motor(MotorRight, dir1Right1, dir1Right2);
+      leftMotor = new Motor(MotorLeft, dir1Left1, dir1Left2);
       pid = new PIDControler(9, 4, .025);
     };
     void addSensor(int pin)
@@ -31,60 +31,34 @@ class Seguidor
     };
     void calibrate()
     {
-      float vel = 1;
-      float tempoInicial = millis();
-      int delayCall = 500;
-      for (int j = 0; j < 5; j++) {
-        do {
-          rotateRight(vel);
-          for (int i = 0; i < activeSensors; i++) {
-            int actualRead = analogRead(i);
-            if (actualRead < lightSensors[i]->getMin())lightSensors[i]->setMin(actualRead);
-            if (actualRead > lightSensors[i]->getMax())lightSensors[i]->setMax(actualRead);
-          }
-        #ifndef BLACK
-        } while (lightSensors[0]->getRawValue() < LIMIAR_MAIS_ESQUERDO);
-        #else
-        } while (lightSensors[0]->getRawValue() > LIMIAR_MAIS_ESQUERDO);
-        #endif
-        tempoInicial = millis();
-        do {
-          for (int i = 0; i < activeSensors; i++) {
-            int actualRead = analogRead(i);
-            if (actualRead < lightSensors[i]->getMin())lightSensors[i]->setMin(actualRead);
-            if (actualRead > lightSensors[i]->getMax())lightSensors[i]->setMax(actualRead);
-          }
-        } while (millis() - tempoInicial < delayCall);
-
-        rotateLeft(vel);
-        do {
-          for (int i = 0; i < activeSensors; i++) {
-            int actualRead = analogRead(i);
-            if (actualRead < lightSensors[i]->getMin())lightSensors[i]->setMin(actualRead);
-            if (actualRead > lightSensors[i]->getMax())lightSensors[i]->setMax(actualRead);
-          }
-        #ifndef BLACK
-        } while (lightSensors[activeSensors - 1]->getRawValue() < LIMIAR_MAIS_DIREITO);
-        #else
-        } while (lightSensors[activeSensors - 1]->getRawValue() > LIMIAR_MAIS_DIREITO);
-      #endif
-
-        tempoInicial = millis();
-        do {
-          for (int i = 0; i < activeSensors; i++) {
-            int actualRead = analogRead(i);
-            if (actualRead < lightSensors[i]->getMin())lightSensors[i]->setMin(actualRead);
-            if (actualRead > lightSensors[i]->getMax())lightSensors[i]->setMax(actualRead);
-          }
-        } while (millis() - tempoInicial < delayCall);
-
+      unsigned long initTime = micros();
+      unsigned long dt = .5;
+      for (int i = 0; i < 5;)
+      {
+        Serial.print("Calibrating ");
+        Serial.println(i);
+        if (abs(micros() - initTime) * 0.000001 < dt)
+          rotateRight(.5);
+        else if (abs(micros() - initTime) * 0.000001 < 2 * dt)
+          rotateLeft(.5);
+        Serial.println(abs(micros() - initTime) * 0.000001);
+        for (int j = 0; j < activeSensors; j++)
+        {
+          lightSensors[j]->setMin(min(lightSensors[j]->getValue(), lightSensors[j]->getMin()));
+          lightSensors[j]->setMax(max(lightSensors[j]->getValue(), lightSensors[j]->getMax()));
+        }
+        if (abs(micros() - initTime) * 0.000001 > 2 * dt)
+        {
+          initTime = micros();
+          i++;
+        }
       }
-      stopMotors();
-      // Retornar ao centro - Tem que melhorar isso
-      rotateRight(vel);
-      while (lightSensors[3]->getValue() < 0.8){};
-      stopMotors();
-    }
+    };
+    void setMaxSpeed(int s)
+    {
+      rightMotor->setMaxSpeed(s);
+      leftMotor->setMaxSpeed(s);
+    };
     void stopMotors()
     {
       rightMotor->stopMotor();
@@ -156,8 +130,9 @@ class Seguidor
       }
 
     };
+
   private:
-    LightSensor  **lightSensors;
+    LightSensor  *lightSensors[6];
     Motor *rightMotor;
     Motor *leftMotor;
     int activeSensors;

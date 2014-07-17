@@ -7,40 +7,42 @@ enum {FOWARD,BACKWARD};
 class Motor
 {
   public:
-  Motor(int positivePin, int negativePin):positivePin(positivePin), negativePin(negativePin),minSpeed(0),maxSpeed(255)
+  Motor(int pwmPin, int directionPin1, int directionPin2):pwmPin(pwmPin), directionPin1(directionPin1),directionPin2(directionPin2),minSpeed(0),maxSpeed(255)
   {
     
   };
   void rotatePwm(int pwm,int d)
   {
+    analogWrite(pwmPin,pwm);
       if(d == FOWARD)
     {
-      analogWrite(positivePin,pwm);
-      analogWrite(negativePin,0);
+      digitalWrite(directionPin1,HIGH);
+      digitalWrite(directionPin2,LOW);
     }
     else
     {
-      analogWrite(positivePin,0);
-      analogWrite(negativePin,pwm);
+      digitalWrite(directionPin1,LOW);
+      digitalWrite(directionPin2,HIGH);
     }
   
   }
   void stopMotor()
   {
-    analogWrite(positivePin,255);
-    analogWrite(negativePin,255);
+    digitalWrite(directionPin1,HIGH);
+    digitalWrite(directionPin2,HIGH);
   };
   void rotate(float s, int d)
   {
-    if(d == FOWARD)
+    analogWrite(pwmPin,(maxSpeed - minSpeed) * s + minSpeed);
+      if(d == FOWARD)
     {
-      analogWrite(positivePin,(maxSpeed - minSpeed) * s + minSpeed);
-      analogWrite(negativePin,0);
+      digitalWrite(directionPin1,HIGH);
+      digitalWrite(directionPin2,LOW);
     }
     else
     {
-      analogWrite(positivePin,0);
-      analogWrite(negativePin,(maxSpeed - minSpeed) * s + minSpeed);
+      digitalWrite(directionPin1,LOW);
+      digitalWrite(directionPin2,HIGH);
     }
   
   };
@@ -54,7 +56,7 @@ class Motor
   };
    int minSpeed,maxSpeed;
   private:
-    int positivePin, negativePin;
+    int pwmPin,directionPin1,directionPin2;
 };
 
 #endif
