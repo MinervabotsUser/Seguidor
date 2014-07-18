@@ -7,6 +7,8 @@
 #define LIMIAR_MENOS_DIREITO        750
 #define LIMIAR_DIREITO              900
 #define LIMIAR_MAIS_DIREITO         900
+#define R  0.015
+#define L  0.085;
 
 #include "Arduino.h"
 #include "LightSensor.h"
@@ -27,7 +29,7 @@ class Seguidor
   public:
     Seguidor(int numberOfSensors, int MotorLeft, int dir1Left1, int dir1Left2, int MotorRight, int dir1Right1, int dir1Right2)
     {
-
+      Serial.print("Seguidor Ok");
       activeSensors = 0;
       rightMotor = new Motor(MotorRight, dir1Right1, dir1Right2);
       rightMotor->setConstants(1.375e4, 0.0003937, -1.815e4, -0.01682);
@@ -36,8 +38,8 @@ class Seguidor
       leftMotor->setConstants(1.34e4, 0.0005189, -1.79e4, -0.01754);
       leftMotor->setTicks(6402, 14876);
       pid = new PIDControler(9, 4, .025);
-      //kalmanPosition = new KalmanFilterPosicao(.1, 1000);
-      //kalmanRotation = new KalmanFilterRotation(1000, .1, .1, 0);
+      //KalmanPosition = new KalmanFilterPosicao(.1, .1);
+      //KalmanRotation = new KalmanFilterRotation(1000, .1, .1, 0);
 
     };
     void addSensor(int pin)
@@ -98,6 +100,7 @@ class Seguidor
     {
       rightMotor->stopMotor();
       leftMotor->stopMotor();
+      velocity.reset();
     }
     void moveFoward(float s)
     {
@@ -171,19 +174,35 @@ class Seguidor
     };
     float getVelocity()
     {
-      //KalmanPosition->Predict();
-      //float aceleration = imu.getAceleration();
-      //KalmanPosition->Update(aceleration);
-      return imu.getAceleration();
+      return(velocity.integrate(imu.getAceleration()));
+    };
+    float getOmega()
+    {
+//      KalmanRotation->Update();
+//      float theta = imu.getHeading();
+      float omega = imu.getOmega();
+//      KalmanRotation->Predict(theta,omega);
+      return omega;
+    };
+    float getRightSpeed()
+    {
+      return this->velocity.getValue()/R + this->getOmega() * 0.5 * R/L;
+    };
+    float getLeftSpeed()
+    {
+      float vr = getRightSpeed();
+      return ((2 * velocity.getValue() / R) - vr);
     };
   private:
     LightSensor  *lightSensors[6];
+    Integrator velocity;
     Motor *rightMotor;
     Motor *leftMotor;
-    KalmanFilterRotation *KalmanRotation;
-    KalmanFilterPosicao *KalmanPosition;
+//    KalmanFilterRotation *KalmanRotation;
+//    KalmanFilterPosicao *KalmanPosition;
     int activeSensors;
     Fuzzy fuzzy;
+    float initialHeading();
     IMU imu;
     PIDControler *pid;
 
