@@ -13,6 +13,15 @@
 #include "Motor.h"
 #include "Fuzzy.h"
 #include "Controler.h"
+#include "IMU.h"
+#include <Wire.h>
+#include <Adafruit_BMP085_U.h>
+#include <Adafruit_L3GD20_U.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_LSM303_U.h>
+#include <Adafruit_10DOF.h>
+#include "KalmanFilter.h"
+
 class Seguidor
 {
   public:
@@ -21,31 +30,34 @@ class Seguidor
 
       activeSensors = 0;
       rightMotor = new Motor(MotorRight, dir1Right1, dir1Right2);
-      rightMotor->setConstants(1.375e4,0.0003937,-1.815e4,-0.01682);
-      rightMotor->setTicks(6580,14759);
+      rightMotor->setConstants(1.375e4, 0.0003937, -1.815e4, -0.01682);
+      rightMotor->setTicks(6580, 14759);
       leftMotor = new Motor(MotorLeft, dir1Left1, dir1Left2);
-      leftMotor->setConstants(1.34e4,0.0005189,-1.79e4,-0.01754);
-      leftMotor->setTicks(6402,14876);
+      leftMotor->setConstants(1.34e4, 0.0005189, -1.79e4, -0.01754);
+      leftMotor->setTicks(6402, 14876);
       pid = new PIDControler(9, 4, .025);
+      //kalmanPosition = new KalmanFilterPosicao(.1, 1000);
+      //kalmanRotation = new KalmanFilterRotation(1000, .1, .1, 0);
+
     };
     void addSensor(int pin)
     {
       lightSensors[activeSensors] = new LightSensor(pin);
       activeSensors++;
     };
-    void calibrateManual(int minMax[6][2]){
-      for(int i = 0; i < activeSensors;i++){
-          lightSensors[i]->setMin(minMax[i][0]);
-          lightSensors[i]->setMax(minMax[i][1]);
+    void calibrateManual(int minMax[6][2]) {
+      for (int i = 0; i < activeSensors; i++) {
+        lightSensors[i]->setMin(minMax[i][0]);
+        lightSensors[i]->setMax(minMax[i][1]);
       }
     };
     void warmMotors()
     {
-        delay(100);
-        rightMotor->rotatePwm(100,FOWARD);
-        leftMotor->rotatePwm(100,FOWARD);
-        delay(5);
-        
+      delay(100);
+      rightMotor->rotatePwm(100, FOWARD);
+      leftMotor->rotatePwm(100, FOWARD);
+      delay(5);
+
     };
     void calibrate()
     {
@@ -89,8 +101,8 @@ class Seguidor
     }
     void moveFoward(float s)
     {
-       rightMotor->rotate(rightMotor->getPwm(s), FOWARD);
-      leftMotor->rotate(leftMotor->getPwm(s), FOWARD);
+      rightMotor->rotate(s, FOWARD);
+      leftMotor->rotate(s, FOWARD);
     };
     void rotateRight(float s)
     {
@@ -129,7 +141,7 @@ class Seguidor
 
       cog = fuzzy.getCog();
       float output = pid->Run(cog);
-      
+
       Serial.print("Cog: ");
       Serial.print(cog);
       Serial.print("\tOutput: ");
@@ -157,14 +169,24 @@ class Seguidor
       }
       */
     };
-    
+    float getVelocity()
+    {
+      //KalmanPosition->Predict();
+      //float aceleration = imu.getAceleration();
+      //KalmanPosition->Update(aceleration);
+      return imu.getAceleration();
+    };
   private:
     LightSensor  *lightSensors[6];
     Motor *rightMotor;
     Motor *leftMotor;
+    KalmanFilterRotation *KalmanRotation;
+    KalmanFilterPosicao *KalmanPosition;
     int activeSensors;
     Fuzzy fuzzy;
+    IMU imu;
     PIDControler *pid;
+
 };
 
 #endif
