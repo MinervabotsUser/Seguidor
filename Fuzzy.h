@@ -19,18 +19,9 @@ const int fis_gcR = 6;
 FIS_TYPE g_fisInput[fis_gcI];
 FIS_TYPE g_fisOutput[fis_gcO];
 
-//***********************************************************************
+/***********************************************************************
 // Support functions for Fuzzy Inference System                          
 //***********************************************************************
-// Trapezoidal Member Function
-FIS_TYPE fis_trapmf(FIS_TYPE x, FIS_TYPE* p)
-{
-    FIS_TYPE a = p[0], b = p[1], c = p[2], d = p[3];
-    FIS_TYPE t1 = ((x <= c) ? 1 : ((d < x) ? 0 : ((c != d) ? ((d - x) / (d - c)) : 0)));
-    FIS_TYPE t2 = ((b <= x) ? 1 : ((x < a) ? 0 : ((a != b) ? ((x - a) / (b - a)) : 0)));
-    return (FIS_TYPE) min(t1, t2);
-}
-
 // Triangular Member Function
 FIS_TYPE fis_trimf(FIS_TYPE x, FIS_TYPE* p)
 {
@@ -86,7 +77,7 @@ FIS_TYPE fis_array_operation(FIS_TYPE *array, int size, _FIS_ARR_OP pfnOp)
 // Pointers to the implementations of member functions
 _FIS_MF fis_gMF[] =
 {
-    fis_trapmf, fis_trimf, fis_gaussmf
+    fis_trimf, fis_gaussmf
 };
 
 // Count of member function for each Input
@@ -96,17 +87,17 @@ int fis_gIMFCount[] = { 2, 2, 2, 2, 2, 2 };
 int fis_gOMFCount[] = { 6, 5, 5 };
 
 // Coefficients for the Input Member Functions
-FIS_TYPE fis_gMFI0Coeff1[] = { -0.9, -0.1, 0.1, 0.9 };
-FIS_TYPE fis_gMFI0Coeff2[] = { 0.1, 0.9, 1.1, 1.9 };
+FIS_TYPE fis_gMFI0Coeff1[] = { -1, 2.776e-17, 1 };
+FIS_TYPE fis_gMFI0Coeff2[] = { 0, 1, 2 };
 FIS_TYPE* fis_gMFI0Coeff[] = { fis_gMFI0Coeff1, fis_gMFI0Coeff2 };
-FIS_TYPE fis_gMFI1Coeff1[] = { -0.9, -0.1, 0.1, 0.9 };
-FIS_TYPE fis_gMFI1Coeff2[] = { 0.1, 0.9, 1.1, 1.9 };
+FIS_TYPE fis_gMFI1Coeff1[] = { -1, 2.776e-17, 1 };
+FIS_TYPE fis_gMFI1Coeff2[] = { 0, 1, 2 };
 FIS_TYPE* fis_gMFI1Coeff[] = { fis_gMFI1Coeff1, fis_gMFI1Coeff2 };
-FIS_TYPE fis_gMFI2Coeff1[] = { -0.9, -0.1, 0.1, 0.9 };
-FIS_TYPE fis_gMFI2Coeff2[] = { 0.1, 0.9, 1.1, 1.9 };
+FIS_TYPE fis_gMFI2Coeff1[] = { -1, 2.776e-17, 1 };
+FIS_TYPE fis_gMFI2Coeff2[] = { 0, 1, 2 };
 FIS_TYPE* fis_gMFI2Coeff[] = { fis_gMFI2Coeff1, fis_gMFI2Coeff2 };
-FIS_TYPE fis_gMFI3Coeff1[] = { -0.9, -0.1, 0.1, 0.9 };
-FIS_TYPE fis_gMFI3Coeff2[] = { 0.1, 0.9, 1.1, 1.9 };
+FIS_TYPE fis_gMFI3Coeff1[] = { -1, 2.776e-17, 1 };
+FIS_TYPE fis_gMFI3Coeff2[] = { 0, 1, 2 };
 FIS_TYPE* fis_gMFI3Coeff[] = { fis_gMFI3Coeff1, fis_gMFI3Coeff2 };
 FIS_TYPE fis_gMFI4Coeff1[] = { -1, 0, 1 };
 FIS_TYPE fis_gMFI4Coeff2[] = { 0, 1, 2 };
@@ -143,21 +134,21 @@ int fis_gMFI0[] = { 0, 0 };
 int fis_gMFI1[] = { 0, 0 };
 int fis_gMFI2[] = { 0, 0 };
 int fis_gMFI3[] = { 0, 0 };
-int fis_gMFI4[] = { 1, 1 };
-int fis_gMFI5[] = { 1, 1 };
+int fis_gMFI4[] = { 0, 0 };
+int fis_gMFI5[] = { 0, 0 };
 int* fis_gMFI[] = { fis_gMFI0, fis_gMFI1, fis_gMFI2, fis_gMFI3, fis_gMFI4, fis_gMFI5};
 
 // Output membership function set
-int fis_gMFO0[] = { 1, 1, 1, 1, 1, 1 };
-int fis_gMFO1[] = { 2, 2, 2, 2, 2 };
-int fis_gMFO2[] = { 2, 2, 2, 2, 2 };
+int fis_gMFO0[] = { 0, 0, 0, 0, 0, 0 };
+int fis_gMFO1[] = { 1, 1, 1, 1, 1 };
+int fis_gMFO2[] = { 1, 1, 1, 1, 1 };
 int* fis_gMFO[] = { fis_gMFO0, fis_gMFO1, fis_gMFO2};
 
 // Rule Weights
-FIS_TYPE fis_gRWeight[] = { 1, 1, 1, 1, 1, 1, 1 };
+FIS_TYPE fis_gRWeight[] = { 1, 1, 1, 1, 1, 1 };
 
 // Rule Type
-int fis_gRType[] = { 1, 1, 1, 1, 1, 1, 1 };
+int fis_gRType[] = { 1, 1, 1, 1, 1, 1 };
 
 // Rule Inputs
 int fis_gRI0[] = { 1, 2, 2, 2, 2, 2 };
@@ -166,8 +157,7 @@ int fis_gRI2[] = { 2, 2, 1, 2, 2, 2 };
 int fis_gRI3[] = { 1, 2, 2, 1, 2, 2 };
 int fis_gRI4[] = { 2, 2, 2, 2, 1, 2 };
 int fis_gRI5[] = { 2, 2, 2, 2, 2, 1 };
-int fis_gRI6[] = { 1, 2, 1, 1, 2, 2 };
-int* fis_gRI[] = { fis_gRI0, fis_gRI1, fis_gRI2, fis_gRI3, fis_gRI4, fis_gRI5, fis_gRI6 };
+int* fis_gRI[] = { fis_gRI0, fis_gRI1, fis_gRI2, fis_gRI3, fis_gRI4, fis_gRI5 };
 
 // Rule Outputs
 int fis_gRO0[] = { 1, 5, 1 };
@@ -176,8 +166,7 @@ int fis_gRO2[] = { 3, 5, 3 };
 int fis_gRO3[] = { 4, 3, 5 };
 int fis_gRO4[] = { 5, 4, 5 };
 int fis_gRO5[] = { 6, 1, 5 };
-int fis_gRO6[] = { 4, 5, 5 };
-int* fis_gRO[] = { fis_gRO0, fis_gRO1, fis_gRO2, fis_gRO3, fis_gRO4, fis_gRO5, fis_gRO6 };
+int* fis_gRO[] = { fis_gRO0, fis_gRO1, fis_gRO2, fis_gRO3, fis_gRO4, fis_gRO5 };
 
 // Input range Min
 FIS_TYPE fis_gIMin[] = { 0, 0, 0, 0, 0, 0 };
@@ -324,7 +313,6 @@ void fis_evaluate()
         }
     }
 }
-
 class Fuzzy
 {
   public:
