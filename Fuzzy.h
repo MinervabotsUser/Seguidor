@@ -19,7 +19,7 @@ const int fis_gcR = 6;
 FIS_TYPE g_fisInput[fis_gcI];
 FIS_TYPE g_fisOutput[fis_gcO];
 
-/***********************************************************************
+//***********************************************************************
 // Support functions for Fuzzy Inference System                          
 //***********************************************************************
 // Triangular Member Function
@@ -108,12 +108,12 @@ FIS_TYPE* fis_gMFI5Coeff[] = { fis_gMFI5Coeff1, fis_gMFI5Coeff2 };
 FIS_TYPE** fis_gMFICoeff[] = { fis_gMFI0Coeff, fis_gMFI1Coeff, fis_gMFI2Coeff, fis_gMFI3Coeff, fis_gMFI4Coeff, fis_gMFI5Coeff };
 
 // Coefficients for the Input Member Functions
-FIS_TYPE fis_gMFO0Coeff1[] = { -3.5, -2.5, -1.5 };
-FIS_TYPE fis_gMFO0Coeff2[] = { -2.5, -1.5, -0.4999 };
-FIS_TYPE fis_gMFO0Coeff3[] = { -1.5, -0.5, 0.5001 };
-FIS_TYPE fis_gMFO0Coeff4[] = { -0.4998, 0.5, 1.5 };
-FIS_TYPE fis_gMFO0Coeff5[] = { 0.4999, 1.5, 2.5 };
-FIS_TYPE fis_gMFO0Coeff6[] = { 1.5, 2.5, 3.5 };
+FIS_TYPE fis_gMFO0Coeff1[] = { -1, 0, 1 };
+FIS_TYPE fis_gMFO0Coeff2[] = { 0, 1, 2 };
+FIS_TYPE fis_gMFO0Coeff3[] = { 1, 2, 3 };
+FIS_TYPE fis_gMFO0Coeff4[] = { 2, 3, 4 };
+FIS_TYPE fis_gMFO0Coeff5[] = { 3, 4, 5 };
+FIS_TYPE fis_gMFO0Coeff6[] = { 4, 5, 6 };
 FIS_TYPE* fis_gMFO0Coeff[] = { fis_gMFO0Coeff1, fis_gMFO0Coeff2, fis_gMFO0Coeff3, fis_gMFO0Coeff4, fis_gMFO0Coeff5, fis_gMFO0Coeff6 };
 FIS_TYPE fis_gMFO1Coeff1[] = { 0.1062, 0 };
 FIS_TYPE fis_gMFO1Coeff2[] = { 0.1062, 0.25 };
@@ -175,10 +175,10 @@ FIS_TYPE fis_gIMin[] = { 0, 0, 0, 0, 0, 0 };
 FIS_TYPE fis_gIMax[] = { 1, 1, 1, 1, 1, 1 };
 
 // Output range Min
-FIS_TYPE fis_gOMin[] = { -2.5, 0, 0 };
+FIS_TYPE fis_gOMin[] = { 0, 0, 0 };
 
 // Output range Max
-FIS_TYPE fis_gOMax[] = { 2.5, 1, 1 };
+FIS_TYPE fis_gOMax[] = { 5, 1, 1 };
 
 //***********************************************************************
 // Data dependent support functions for Fuzzy Inference System                          
@@ -313,6 +313,7 @@ void fis_evaluate()
         }
     }
 }
+
 class Fuzzy
 {
   public:
@@ -322,7 +323,7 @@ class Fuzzy
     };
     float getCog()
     {
-      return g_fisOutput[0];
+      return g_fisOutput[0]-2.5;
     };
     float getMotorRightSpeed()
     {
